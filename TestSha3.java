@@ -102,8 +102,12 @@ public class TestSha3 {
       id =1;
       H =block;
       zeroByte(block, h0, id, H);
+      String block1 = vk1hex[1]+" gives 5 Euros to "+vk2hex[1];
+      System.out.println("'"+block1+"'");
+      //"vk1 transfert 5€ à vk2" || signature sous sk1
       // String
-      // generateSignature(sk1, )
+      byte [] testSig =generateSignature(sk1, block1.getBytes());
+      System.out.println("testSig :"+Hex.toHexString(testSig));
     }catch(GeneralSecurityException e){
       System.out.println(e.getMessage());
     }
