@@ -1,36 +1,35 @@
 import java.security.MessageDigest;
+
 import org.bouncycastle.jcajce.provider.digest.SHA3.DigestSHA3;
 import org.bouncycastle.jcajce.provider.digest.SHA3.Digest256;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.KeyPairGenerator;
-import java.security.Security;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.ECPoint;
-import java.security.spec.ECPublicKeySpec;
+import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 
-import javax.crypto.Cipher;
+import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
-import org.bouncycastle.jce.spec.ECNamedCurveSpec;
+import org.bouncycastle.crypto.signers.ECDSASigner;
+
+import org.bouncycastle.math.ec.ECPoint;
+
+import org.bouncycastle.crypto.*;
+
+
+import java.security.*;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
 
- import java.security.*;
- import java.security.spec.ECGenParameterSpec;
+import org.bouncycastle.asn1.ASN1Encodable;
+
+import java.math.BigInteger;
 
 
-// import org.bouncycastle.jce.spec.ECGenParameterSpec;
-
-
-// import java.math.BigInteger;
-// import org.bouncycastle.math.ec.*;
-// import org.bouncycastle.jce.spec.*;
 
 import java.util.*;
 
@@ -69,46 +68,33 @@ public class TestSha3 {
 
     try{
 
-      KeyPair pair1 =generateKeyPair();
-      KeyPair pair2 =generateKeyPair();
-      KeyPair pair3 =generateKeyPair();
-
-      PrivateKey sk1 = pair1.getPrivate();
-      PublicKey vk1 = pair1.getPublic();
-      byte [] pub1 =vk1.getEncoded();
-      String vk1hextmp = Hex.toHexString(pub1);
-      String[] vk1hex = vk1hextmp.split("3038301006072a8648ce3d020106052b81040016032400040");
-
-      PrivateKey sk2 = pair2.getPrivate();
-      PublicKey vk2 = pair2.getPublic();
-      byte [] pub2 =vk2.getEncoded();
-      String vk2hextmp = Hex.toHexString(pub2);
-      String[] vk2hex = vk2hextmp.split("3038301006072a8648ce3d020106052b81040016032400040");
-
-      PrivateKey sk3 = pair3.getPrivate();
-      PublicKey vk3 = pair3.getPublic();
-      byte [] pub3 =vk3.getEncoded();
-      String vk3hextmp = Hex.toHexString(pub3);
-      String[] vk3hex = vk3hextmp.split("3038301006072a8648ce3d020106052b81040016032400040");
-      //pour prime : format :3049301306072a8648ce3d020106082a8648ce3d0301010332000
-
-      System.out.println("Wallet 1 = vk1 = "+vk1hex[1]);
-      System.out.println("Wallet 2 = vk2 = "+vk2hex[1]);
-      System.out.println("Wallet 3 = vk3 = "+vk3hex[1]);
-
+      byte [] vk1 =generatePrivate();//Genrate public wired but for testing
+      byte [] vk2 =generatePrivate();
+      byte [] vk3 =generatePrivate();
+      //
+      // byte [] sk1 =generatePrivate();
+      AsymmetricCipherKeyPair pair = generatePublic();
+      System.out.println("Wallet 1 = vk1 = "+Hex.toHexString(vk1));
+      System.out.println("Wallet 1 = vk2 = "+Hex.toHexString(vk2));
+      System.out.println("Wallet 1 = vk3 = "+Hex.toHexString(vk3));
+      //
+      //
       System.out.println("\n*** BlockChain of Transactions  ***");
       System.out.println("Init the Hash Chain: h0 = "+h0);
-      String block = vk1hex[1]+" receives 10 Euros";
-      System.out.println("Add a New Block '"+block+"'");
+      String block = Hex.toHexString(vk1)+" receives 10 Euros";
+      // System.out.println("Add a New Block '"+block+"'");
       id =1;
       H =block;
       zeroByte(block, h0, id, H);
-      String block1 = vk1hex[1]+" gives 5 Euros to "+vk2hex[1];
-      System.out.println("'"+block1+"'");
-      //"vk1 transfert 5€ à vk2" || signature sous sk1
-      // String
-      byte [] testSig =generateSignature(sk1, block1.getBytes());
-      System.out.println("testSig :"+Hex.toHexString(testSig));
+      String block1 = Hex.toHexString(vk1)+" gives 5 Euros to "+Hex.toHexString(vk2);
+      System.out.println("Add a New Block '"+Hex.toHexString(vk1)+"\n\t\t    gives 5 Euros to "+Hex.toHexString(vk2)+"'");
+      // //"vk1 transfert 5€ à vk2" || signature sous sk1
+      String testSig = Hex.toHexString(vk1)+"gives 5 Euros to"+Hex.toHexString(vk2);
+      BigInteger[] test = signature(pair.getPrivate(), testSig.getBytes());
+      System.out.println("Sig[0] :"+test[0].toString(16)+"\nSig[1] :"+test[1].toString(16));
+
+      // byte [] testSig =generateSignature(sk1, block1.getBytes());
+      // System.out.println("testSig :"+Hex.toHexString(testSig));
     }catch(GeneralSecurityException e){
       System.out.println(e.getMessage());
     }
@@ -116,33 +102,57 @@ public class TestSha3 {
 
   }
 
+// Une bonne base pour générer des clefs
+// Fouiller la bibliothèque (la doc BouncyCastle) pour trouver les paramètres dont vous avez besoin
 
-  public static KeyPair generateKeyPair()throws GeneralSecurityException{
+  public static byte[] generatePrivate()throws GeneralSecurityException{
 
-    // ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
-    ECGenParameterSpec ecSpec = new ECGenParameterSpec("sect131r1");
-    KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA", "BC");
-    keyGen.initialize(ecSpec, new SecureRandom());
-    KeyPair pair = keyGen.generateKeyPair();
+    ECKeyPairGenerator g = new ECKeyPairGenerator();
+    SecureRandom secureRandom = new SecureRandom();
+    X9ECParameters secnamecurves = SECNamedCurves.getByName("secp256k1");
+    ECDomainParameters ecParams = new ECDomainParameters(secnamecurves.getCurve(), secnamecurves.getG(), secnamecurves.getN(), secnamecurves.getH());
+    ECKeyGenerationParameters keyGenParam = new ECKeyGenerationParameters(ecParams, secureRandom);
+    g.init(keyGenParam);
+    AsymmetricCipherKeyPair pair = g.generateKeyPair();
+    ECPrivateKeyParameters privatekey = (ECPrivateKeyParameters)pair.getPrivate();
+    ECPoint dd = secnamecurves.getG().multiply(privatekey.getD());
+    byte[] publickey = dd.getYCoord().toBigInteger().toByteArray();
+    byte [][] keys = new byte[][]{privatekey.getD().toByteArray(),publickey};
+
+    return publickey;
+  }
+  public static AsymmetricCipherKeyPair generatePublic()throws GeneralSecurityException{
+
+    ECKeyPairGenerator g = new ECKeyPairGenerator();
+    SecureRandom secureRandom = new SecureRandom();
+    X9ECParameters secnamecurves = SECNamedCurves.getByName("secp256k1");
+    ECDomainParameters ecParams = new ECDomainParameters(secnamecurves.getCurve(), secnamecurves.getG(), secnamecurves.getN(), secnamecurves.getH());
+    ECKeyGenerationParameters keyGenParam = new ECKeyGenerationParameters(ecParams, secureRandom);
+    g.init(keyGenParam);
+    AsymmetricCipherKeyPair pair = g.generateKeyPair();
+    ECPrivateKeyParameters privatekey = (ECPrivateKeyParameters)pair.getPrivate();
+    ECPoint dd = secnamecurves.getG().multiply(privatekey.getD());
+    byte[] publickey = dd.getYCoord().toBigInteger().toByteArray();
+    byte [][] keys = new byte[][]{privatekey.getD().toByteArray(),publickey};
     return pair;
   }
 
 
-  public static byte[] generateSignature(PrivateKey ecPrivate, byte[] input) throws GeneralSecurityException{
+  public static BigInteger[] signature(CipherParameters privatekey, byte[] input) throws GeneralSecurityException{
 
-    Signature signature = Signature.getInstance("SHA384withECDSA", "BC");
-    signature.initSign(ecPrivate);
-    signature.update(input);
-    return signature.sign();
+    ECDSASigner signer = new ECDSASigner();
+    signer.init(true, privatekey);
+    final BigInteger[] signature = signer.generateSignature(input);
+    return signature;
   }
 
 
-  public static boolean verifySignature(PublicKey ecPublic, byte[] input, byte[] encSignature) throws GeneralSecurityException{
+  public static boolean verifySignature(CipherParameters privatekey, byte[] input, BigInteger [] signature) throws GeneralSecurityException{
 
-    Signature signature = Signature.getInstance("SHA384withECDSA", "BCFIPS");
-    signature.initVerify(ecPublic);
-    signature.update(input);
-    return signature.verify(encSignature);
+    ECDSASigner verifier = new ECDSASigner();
+    verifier.init(false, privatekey);
+    boolean test =verifier.verifySignature(input, signature[0], signature[1]);
+    return true;
   }
 
 	public static byte [] zeroByte(String hr, String h0, int id, String H){
