@@ -92,7 +92,8 @@ public class TestSha3 {
       String testSig = Hex.toHexString(vk1)+"gives 5 Euros to"+Hex.toHexString(vk2);
       BigInteger[] test = signature(pair.getPrivate(), testSig.getBytes());
       System.out.println("Sig[0] :"+test[0].toString(16)+"\nSig[1] :"+test[1].toString(16));
-
+      boolean verif =verifySignature(pair.getPublic(),testSig.getBytes(), test);
+      System.out.println("Validity of the signature : "+verif);
       // byte [] testSig =generateSignature(sk1, block1.getBytes());
       // System.out.println("testSig :"+Hex.toHexString(testSig));
     }catch(GeneralSecurityException e){
@@ -138,10 +139,10 @@ public class TestSha3 {
   }
 
 
-  public static BigInteger[] signature(CipherParameters privatekey, byte[] input) throws GeneralSecurityException{
+  public static BigInteger[] signature(CipherParameters publickey, byte[] input) throws GeneralSecurityException{
 
     ECDSASigner signer = new ECDSASigner();
-    signer.init(true, privatekey);
+    signer.init(true, publickey);
     final BigInteger[] signature = signer.generateSignature(input);
     return signature;
   }
@@ -152,7 +153,7 @@ public class TestSha3 {
     ECDSASigner verifier = new ECDSASigner();
     verifier.init(false, privatekey);
     boolean test =verifier.verifySignature(input, signature[0], signature[1]);
-    return true;
+    return test;
   }
 
 	public static byte [] zeroByte(String hr, String h0, int id, String H){
