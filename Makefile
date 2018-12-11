@@ -3,7 +3,7 @@ JAVA_SOURCE = $(shell find . -maxdepth 1 -name "*.java")
 JAVAC = javac
 JVM = java
 JAR = jar
-MAIN = TestSha3
+MAIN = Blockchain
 
 .java: $(JAVA_SOURCE)
 	$(JAVAC) -cp "$(LIB):." $?
