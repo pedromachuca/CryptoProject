@@ -76,9 +76,9 @@ public class Blockchain {
     byte [] vk2 = keygen2.publickey;
     byte [] vk3 = keygen3.publickey;
 
-    System.out.println(" vk1 : "+hashToString(vk1));
-    System.out.println(" vk2 : "+hashToString(vk2));
-    System.out.println(" vk3 : "+hashToString(vk3));
+    System.out.println("Wallet 1 = vk1 = "+hashToString(vk1));
+    System.out.println("Wallet 2 = vk2 = "+hashToString(vk2));
+    System.out.println("Wallet 3 = vk3 = "+hashToString(vk3));
 
     System.out.println("\n*** BlockChain of Transactions  ***");
     System.out.println("Init the Hash Chain: h0 = "+h0);
@@ -95,13 +95,13 @@ public class Blockchain {
 
     try{
 
-      sign1 = keygen1.signature(keygen1.pair.getPrivate(), stringSig1.getBytes());
-      verif1 =keygen1.verifySignature(keygen1.pair.getPublic(),stringSig1.getBytes(), sign1);
+      sign1 = keygen1.signature(keygen1.pair.getPrivate(),sha3byte(stringSig1));
+      verif1 =keygen1.verifySignature(keygen1.pair.getPublic(),sha3byte(stringSig1), sign1);
 
     }catch(GeneralSecurityException e){System.out.println(e.getMessage());}
 
-    System.out.println("\t\t|| "+sign1[0].toString(16));
-    System.out.println("\t\t|| "+sign1[1].toString(16)+"'");
+  //  System.out.println("\t\t|| "+sign1[0].toString(16));
+   // System.out.println("\t\t|| "+sign1[1].toString(16)+"'");
 
     String H2 = hashToString(vk1)+"\n\t\t\tgives 5 Euros to "+hashToString(vk2)+"\n\t\t|| "+sign1[0].toString(16)+"\n\t\t|| "+sign1[1].toString(16);
     String block1 = hashToString(vk1)+"gives 5 Euros to"+hashToString(vk2)+sign1[0].toString(16)+sign1[1].toString(16);
@@ -116,8 +116,8 @@ public class Blockchain {
 
     try{
 
-      sign2 = keygen1.signature(keygen1.pair.getPrivate(), stringSig2.getBytes());
-      verif2 =keygen1.verifySignature(keygen1.pair.getPublic(),stringSig2.getBytes(), sign2);
+      sign2 = keygen1.signature(keygen1.pair.getPrivate(),sha3byte(stringSig2));
+      verif2 =keygen1.verifySignature(keygen1.pair.getPublic(),sha3byte(stringSig2), sign2);
 
     }catch(GeneralSecurityException e){System.out.println(e.getMessage());}
 
