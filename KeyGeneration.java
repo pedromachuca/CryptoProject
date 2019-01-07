@@ -43,19 +43,19 @@ public class KeyGeneration{
     publickey = dd.getYCoord().toBigInteger().toByteArray();
   }
   
-  public BigInteger[] signature(CipherParameters publickey, byte[] input) throws GeneralSecurityException{
+  public BigInteger[] signature(CipherParameters privatekey, byte[] input) throws GeneralSecurityException{
 
     ECDSASigner signer = new ECDSASigner();
-    signer.init(true, publickey);
+    signer.init(true, privatekey);
     final BigInteger[] signature = signer.generateSignature(input);
     return signature;
   }
 
 
-  public boolean verifySignature(CipherParameters privatekey, byte[] input, BigInteger [] signature) throws GeneralSecurityException{
+  public boolean verifySignature(CipherParameters publickey, byte[] input, BigInteger [] signature) throws GeneralSecurityException{
 
     ECDSASigner verifier = new ECDSASigner();
-    verifier.init(false, privatekey);
+    verifier.init(false, publickey);
     boolean isVerified =verifier.verifySignature(input, signature[0], signature[1]);
     return isVerified;
   }
